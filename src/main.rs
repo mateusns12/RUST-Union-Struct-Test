@@ -7,13 +7,20 @@
 
 use std::mem::ManuallyDrop;
 
-#[derive(Debug, Copy, Clone)] // no sense made
-#[repr(C)]
+
+//These anotations stabilize the union so there is no need to acess using ManuallyDrop.
+//Not the purpose of the code.
+
+//#[derive(Debug, Copy, Clone)] // <- cheating 
+//#[derive(Debug)]              // <- cheating
+
+
+//#[repr(C)]                    // <- removed, since C types aren't being used
 struct Dados{
     f:ManuallyDrop<f32>,
     g:ManuallyDrop<f32>
 }
-#[derive(Copy, Clone)]
+//#[derive(Copy, Clone)]        // <- cheating
 union Packet { 
     buffer:[u8;std::mem::size_of::<Dados>()],
     dados: ManuallyDrop<Dados>  
@@ -41,7 +48,10 @@ fn main() {
     // Can be changed by using ManuallyDrop::new() inside union declaration (theory)
     let mut u = Packet { dados: ManuallyDrop::new(Dados{f:ManuallyDrop::new(0.0),g:ManuallyDrop::new(0.0)}) };
     println!("\n");
-    println!("Reading all union fields : {:?}",unsafe{u.dados});
+
+    //this acess asks to derive from copy and degub
+    //println!("Reading all union fields : {:?}",unsafe{u.dados}); 
+
     println!("Reading union initial buffer byte values {:?}",unsafe { u.buffer });
     unsafe {
         // Borrowing ownership to write value
